@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Specification-Title: com.owtelse.splat
+Specification-Version: VERSION
+Specification-Vendor: com.owtelse
+Implementation-Title: com.owtelse.splat
+Implementation-Version: VERSION
+Implementation-Vendor: com.owtelse
+
