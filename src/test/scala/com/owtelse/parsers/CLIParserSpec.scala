@@ -17,7 +17,7 @@ class CLIParserSpec extends CLIParserTest {
 
 
 
-trait CLIParserTest  extends Specification with ScalaCheck with ThrownExpectations with CLIParserFixtures{
+trait CLIParserTest  extends Specification with ScalaCheck with ThrownExpectations{
 
   def recogniseFlagNames = clips.recogniseFlagNames
   
@@ -25,7 +25,7 @@ trait CLIParserTest  extends Specification with ScalaCheck with ThrownExpectatio
   
   
 
-  object clips  extends FlagNameGen {
+  object clips  extends CLIParser with FlagNameGen {
     //import org.scalacheck._
     import org.scalacheck.Prop._
 
@@ -41,18 +41,23 @@ trait CLIParserTest  extends Specification with ScalaCheck with ThrownExpectatio
     }
     
     val propRecogniseFlagNames = propKnownFlagnameParses
+
+
+    def parse(p: Parser[Any])(i: String) = {
+      parseAll(p, i)
+    }
   }
+
+
 
 
 }
 
-trait CLIParserFixtures extends CLIParser {
+trait CLIParserFixtures  {
   val knownShortFlags = SortedSet("p","t","d")
   val knownLongFlags = Set("lax")
 
-  def parse(p: Parser[Any])(i: String) = {
-    parseAll(p, i)
-  }
+
 }
 
 
