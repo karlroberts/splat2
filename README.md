@@ -1,5 +1,5 @@
 NAME
-        splat2 - command line 'arrrrg processor
+        splat2 - manage configuration across an enterprise's environments
 
 DESCRIPTION
         Splat2 is a tool to help manage configuration of software under source control across the various environments,
@@ -23,4 +23,4 @@ NOTES
         2. site and documentation
            http://??
         3. license (3 point BSD style)
-           https://github.com/karlroberts/???/LICENSE
+           https://github.com/karlroberts/splat2/blob/master/LICENSE
