@@ -15,18 +15,18 @@ case object emptyFlag extends Flag[Nothing] {
 
 case class SimpleFlag[A](short: String, description: String) extends Flag[A]
 
-case class SimpleArgFlag[A](short: String, description: String, arg: String) extends Flag[A]
+case class SimpleArgFlag[A](short: String, description: String, arg: List[String]) extends Flag[A]
 
 case class LongFlag[A](long: String, description: String) extends Flag[A]
 
-case class LongArgFlag[A](long: String, description: String, arg: String) extends Flag[A]
+case class LongArgFlag[A](long: String, description: String, arg:  List[String]) extends Flag[A]
 
 case class ComplexFlag[A](short: String, long: String, description: String) extends Flag[A]
 
-case class ComplexArgFlag[A](short: String, long: String,  description: String, arg: String) extends Flag[A]
+case class ComplexArgFlag[A](short: String, long: String,  description: String, arg:  List[String]) extends Flag[A]
 
 // export curried constructor funcs
 object Flags {
-  def simpleArgFlag[A](short: String, description: String)(arg: String) = SimpleArgFlag[A](short, description, arg)
+  def simpleArgFlag[A](short: String, description: String)(args:  List[String]) = SimpleArgFlag[A](short, description, args)
 }
 
