@@ -3,9 +3,11 @@ package com.owtelse
 import org.specs2._
 import parsers.{Flag, emptyFlag, SimpleArgFlag, LongFlag,  CLIParser}
 
-class CLIParserManualSpec extends Specification {
+class CliParserManualSpec extends Specification {
   def is = "This is a specification to manulaly check individual parsers from the bottom up"                            ^ p ^
     "The 'CLIParser'  should"                                                                                           ^
+    "parse any word into a word"                                                                                        ! aWord ^
+    "parse any flagArg, ie ':' separated word into a List[String] which each arg ocupying a pos in the list"            ! checkflagArg ^
     "shortFlag will parse -p into type (String => SimpleArgFlag[_])"                                                    ! properties ^
     "shortFlag will parse -t into type (String => SimpleArgFlag[_])"                                                    ! templates ^
     "shortFlag will parse -d into type (String => SimpleArgFlag[_])"                                                    ! templateDirs ^
@@ -15,6 +17,8 @@ class CLIParserManualSpec extends Specification {
     "longFlag will parse --lax into a lax Flag"                                                                         ! lax ^
                                                                                                                         end
 
+  def aWord = clips.aWord
+  def checkflagArg = clips.checkflagArg
   def properties = clips.e1
   def emptyFlags = clips.emptyFlags
   def unknown = clips.unknown
@@ -39,6 +43,39 @@ class CLIParserManualSpec extends Specification {
         case _:Failure => false
       }
     }
+    
+    def aWord = {
+      val pRez = parse(someword)("blah ")
+      pRez match {
+        case x:Success[_] => {
+          val pVal = x.get
+          println("-------->>>> word = " + pVal)
+          pVal match {
+            case "blah" => true
+            case z      => {println("-------->>>> wrong word = " + z); false}
+          }
+        }
+        case oops:Failure => { println("-------->>>> ooops");
+          false
+        }
+      }
+    }
+
+    def checkflagArg = {
+      val pRez = parse(flagArg)("a1:a2:a3")
+      pRez match {
+        case x:Success[_] => {
+          val pVal = x.get
+          println("---------> args are = " + pVal)
+          pVal match {
+            case List("a1","a2","a3") => true
+            case _      => false
+          }
+        }
+        case oops:Failure => false
+      }
+    }
+
 
     def e1 = testFlag(shortFlag)("-p")("p")
 
@@ -53,9 +90,7 @@ class CLIParserManualSpec extends Specification {
 
       pRez match {
         case x:Success[_] => false
-        case oops:Failure => { println("Ooops ----->" + oops)
-          true
-        }
+        case oops:Failure => true
       }
     }
     
@@ -66,7 +101,13 @@ class CLIParserManualSpec extends Specification {
           val pVal = x.get
 
           pVal match {
-            case v: SimpleArgFlag[_] if(v.description == "properties") => true
+            case v: SimpleArgFlag[_] if(v.description == "properties") => {
+              println("-p a1:a2:a3 went to : " + v.arg)
+              println("so first arg is " + v.arg.head)
+              if(List("a1:a2:a3") == v.arg) false //should be a list of strings already separated!!
+              else if(List("a1","a2","a3") == v.arg) true
+              else false
+            }
             case _ => false
           }
         }

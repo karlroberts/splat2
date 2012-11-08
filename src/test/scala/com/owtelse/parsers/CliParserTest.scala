@@ -11,7 +11,7 @@ import org.scalacheck.Gen
  * User: robertk
  */
 
-trait CLIParserTest extends Specification with ScalaCheck with ThrownExpectations {
+trait CliParserTest extends Specification with ScalaCheck with ThrownExpectations {
 
   def recogniseShortFlagNames = clips.recogniseShortFlagNames
   def recogniseLongFlagNames = clips.recogniseLongFlagNames
@@ -34,12 +34,11 @@ trait CLIParserTest extends Specification with ScalaCheck with ThrownExpectation
 
     def oops =  oops1
 
-
   }
 
 }
 
-trait CLIParserFixtures {
+trait CliParserFixture {
 
   import collection.immutable.SortedSet
 
@@ -48,13 +47,7 @@ trait CLIParserFixtures {
   val knownLongFlags = Set("lax")
 }
 
-
-
-
-
-
-
-object parseTestHelper extends CLIParser with flagGenerator {
+object parseTestHelper extends CLIParser with FlagGenerator {
   def parse(p: Parser[Any])(i: String) = {
     parseAll(p, i)
   }
@@ -93,20 +86,6 @@ object parseTestHelper extends CLIParser with flagGenerator {
   def propKnownLongFlagnameParses = propKnownFlagnameParses(knownLongFlags,genLongFlagName)(longFlagName)
 
 
- /* def propNotKnownFlagnameParses(size: ) = forAll(genSizedNotShortFlagName(2)) {
-    fname: String =>
-      parse(shortFlagName)(fname) match {
-        case x: Failure => {
-          //println("--- good, parse fail fname("+fname.size+"):"+fname + " :- " + stringCodePointschars(fname))
-          !knownShortFlags.contains(fname)
-        }
-        case _ => {
-          println("--- Aaarh propNotKnownFlagnameParses fname(" + fname.size + "):"+fname + " :- " + stringCodePointschars(fname))
-          false
-        }
-      }
-  }*/
-
   //limit the generated arbitrary non flag strings to 2Chars, ie up to and bigger than known strings but not so big as to waste time generating
   def propNotKnownShortFlagnameParses = forAll(genSizedNotShortFlagName(2)) {
     fname: String =>
@@ -125,7 +104,7 @@ object parseTestHelper extends CLIParser with flagGenerator {
 
 
   //limit the generated arbitrary non flag strings to 2Chars, ie up to and bigger than known strings but not so big as to waste time generating
-  def propNotKnownLongFlagnameParses = forAll(genSizedNotLongFlagName(1)) {
+  def propNotKnownLongFlagnameParses = forAll(genSizedNotLongFlagName(3)) {
     fname: String =>
       parse(longFlagName)(fname) match {
         case x: Failure => {
@@ -179,7 +158,7 @@ object parseTestHelper extends CLIParser with flagGenerator {
 /**
  * Generates arbitrary Flagnames and !Flagnames
  */
-trait FlagNameGen extends CLIParserFixtures {
+trait FlagNameGen extends CliParserFixture {
 
   import org.scalacheck.{Gen, Arbitrary}
   import Arbitrary.arbitrary
@@ -211,7 +190,7 @@ trait FlagNameGen extends CLIParserFixtures {
 /**
  * Generates arbitrary Flags
  */
-trait flagGenerator extends FlagNameGen {
+trait FlagGenerator extends FlagNameGen {
   import org.scalacheck.Gen
 
 
