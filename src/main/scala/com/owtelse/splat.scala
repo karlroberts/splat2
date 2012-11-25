@@ -26,12 +26,17 @@ package object splat {
 /** bunch of specific flags splat needs **/
 object knownFlags {
   import splat._
+
+  val verbose = SimpleFlag[String]("v","verbose")
   
   val props = sArgFlag[String]("p","properties")
   val templates = sArgFlag[String]("t","templates")
   val templateDirs = sArgFlag[String]("d","templateDirs")
 
   val lax = lFlag("lax", "opposite of Strict, ie does not need a full envpath but will find all thoses paths that share the given prefix")
+  val version = lFlag("version", "show version")
+
+
 
   val knownShortArgFlags = Map(
     "p" -> props ,
@@ -39,14 +44,17 @@ object knownFlags {
     "d" -> templateDirs ,
     "x" -> emptyFlagz
   )
-  val knownShortFlags = Map()
+  val knownShortFlags = Map(
+    "v" -> verbose
+  )
 
   val knownLongArgFlags = Map()
   val knownLongFlags = Map(
-    "lax" -> lax
+    "lax" -> lax,
+    "version" -> version
   )
 
-  /**note does not return an Option as parser only allows certain flags anyway,
+  /**note does not return an Option because parser only allows certain flags anyway,
    * so can throw exception if extra flag added to parser but not added to knownArgFlags
    */
   def getShortFlags(name: String): Flag[Any] = {

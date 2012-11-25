@@ -40,11 +40,11 @@ trait CliParserTest extends Specification with ScalaCheck with ThrownExpectation
 
 trait CliParserFixture {
 
-  import collection.immutable.SortedSet
+  import com.owtelse.knownFlags._;
 
   val flagPrefix = "-"
-  val knownShortFlags = Set("p", "t", "d")
-  val knownLongFlags = Set("lax")
+  //val knownShortFlags = Set("p", "t", "d")
+  //val knownLongFlags = Set("lax")
 }
 
 object parseTestHelper extends CLIParser with FlagGenerator {
@@ -53,6 +53,7 @@ object parseTestHelper extends CLIParser with FlagGenerator {
   }
 
   import org.scalacheck.Prop._
+  import com.owtelse.knownFlags._;
 
   //oops list of specific chars I try to fail the parse with.
   def oops1 = {
@@ -69,7 +70,7 @@ object parseTestHelper extends CLIParser with FlagGenerator {
     }
   }
 
-  def propKnownFlagnameParses(knownFlags:Set[String], flagNameGen: Gen[String])(p: Parser[Any]) = forAll(flagNameGen) {
+  def propKnownFlagnameParses(knownFlags:Map[String,Flag], flagNameGen: Gen[String])(p: Parser[Any]) = forAll(flagNameGen) {
     fname: String =>
       assert(knownFlags.contains(fname), "WTF in "+knownFlags+"!!! fname is "+fname)
       val parseResult = parse(p)(fname)
@@ -162,6 +163,7 @@ trait FlagNameGen extends CliParserFixture {
 
   import org.scalacheck.{Gen, Arbitrary}
   import Arbitrary.arbitrary
+  import com.owtelse.knownFlags._;
 
   def genShortFlagName = genFlagName(knownShortFlags)
   def genLongFlagName = genFlagName(knownLongFlags)

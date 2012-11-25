@@ -28,5 +28,6 @@ case class ComplexArgFlag[A](short: String, long: String,  description: String, 
 // export curried constructor funcs
 object Flags {
   def simpleArgFlag[A](short: String, description: String)(args:  List[String]) = SimpleArgFlag[A](short, description, args)
+
 }
 
