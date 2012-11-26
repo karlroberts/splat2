@@ -173,10 +173,9 @@ trait FlagNameGen extends CliParserFixture {
 
 
 
-  def genFlagName(knownFlagNameSet: Set[String]): Gen[String] = for {
-    s <- Gen.oneOf(knownFlagNameSet.toList)
-    if (s != null && knownFlagNameSet.contains(s))
-  } yield s
+  def genFlagName(knownFlags: Map[String, Flag[String]]): Gen[String] = for {
+    s <- Gen.oneOf(knownFlags.values.toSeq)
+  } yield s.symbol
 
 
   def genNotFlagName(knownFlags: Set[String]): Gen[String] = Gen.sized {

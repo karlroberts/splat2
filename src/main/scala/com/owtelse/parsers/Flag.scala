@@ -10,24 +10,25 @@ sealed trait Flag[+A] {
 }
 
 case object emptyFlag extends Flag[Nothing] {
+  val symbol:String = "empty"
   val description = "empty"
 }
 
-case class SimpleFlag[A](short: String, description: String) extends Flag[A]
+case class SimpleFlag[A](symbol: String, description: String) extends Flag[A]
 
-case class SimpleArgFlag[A](short: String, description: String, arg: List[String]) extends Flag[A]
+case class SimpleArgFlag[A](symbol: String, description: String, arg: List[String]) extends Flag[A]
 
-case class LongFlag[A](long: String, description: String) extends Flag[A]
+case class LongFlag[A](symbol: String, description: String) extends Flag[A]
 
-case class LongArgFlag[A](long: String, description: String, arg:  List[String]) extends Flag[A]
+case class LongArgFlag[A](symbol: String, description: String, arg:  List[String]) extends Flag[A]
 
-case class ComplexFlag[A](short: String, long: String, description: String) extends Flag[A]
+case class ComplexFlag[A](symbol: String, long: String, description: String) extends Flag[A]
 
-case class ComplexArgFlag[A](short: String, long: String,  description: String, arg:  List[String]) extends Flag[A]
+case class ComplexArgFlag[A](symbol: String, long: String,  description: String, arg:  List[String]) extends Flag[A]
 
 // export curried constructor funcs
 object Flags {
-  def simpleArgFlag[A](short: String, description: String)(args:  List[String]) = SimpleArgFlag[A](short, description, args)
+  def simpleArgFlag[A](symbol: String, description: String)(args:  List[String]) = SimpleArgFlag[A](symbol, description, args)
 
 }
 
