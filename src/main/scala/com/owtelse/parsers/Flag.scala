@@ -6,11 +6,12 @@ package com.owtelse.parsers
  */
 
 sealed trait Flag[+A] {
+  val symbol: String
   val description: String
 }
 
 case object emptyFlag extends Flag[Nothing] {
-  val symbol:String = "empty"
+  val symbol = "empty"
   val description = "empty"
 }
 

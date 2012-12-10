@@ -70,7 +70,7 @@ object parseTestHelper extends CLIParser with FlagGenerator {
     }
   }
 
-  def propKnownFlagnameParses(knownFlags:Map[String,Flag], flagNameGen: Gen[String])(p: Parser[Any]) = forAll(flagNameGen) {
+  def propKnownFlagnameParses(knownFlags:Map[String,Flag[String]], flagNameGen: Gen[String])(p: Parser[Any]) = forAll(flagNameGen) {
     fname: String =>
       assert(knownFlags.contains(fname), "WTF in "+knownFlags+"!!! fname is "+fname)
       val parseResult = parse(p)(fname)
@@ -178,11 +178,11 @@ trait FlagNameGen extends CliParserFixture {
   } yield s.symbol
 
 
-  def genNotFlagName(knownFlags: Set[String]): Gen[String] = Gen.sized {
+  def genNotFlagName(knownFlags: Map[String, Flag[String]]): Gen[String] = Gen.sized {
     size => for {
       s <- arbitrary[String]
       cleaned = s.filter{c  => val x = char2Character(c) 
-      !knownFlags.contains(new String(x.toString)) && x != null }
+      !knownFlags.contains (new String(x.toString)) && x != null }
 
     } yield cleaned
   }
