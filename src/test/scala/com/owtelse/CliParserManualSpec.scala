@@ -26,7 +26,7 @@ class CliParserManualSpec extends Specification {
   def templates = clips.templates
   def templateDirs = clips.templateDirs
   def propsWithArgs = clips.propsWithArgs
-  def lax = skipped //clips.lax
+  def lax =  clips.lax
 
   object clips {
     import parseTestHelper._

@@ -23,16 +23,19 @@ package object splat {
 
 }
 
-/** bunch of specific flags splat needs **/
+/** bunch of specific pre-canned flags splat supports **/
 object knownFlags {
   import splat._
 
+  //short Flags
   val verbose = SimpleFlag[String]("v","verbose")
-  
+
+  //short ArgFlags
   val props = sArgFlag[String]("p","properties")
   val templates = sArgFlag[String]("t","templates")
   val templateDirs = sArgFlag[String]("d","templateDirs")
 
+  //long Flags
   val lax = lFlag("lax", "opposite of Strict, ie does not need a full envpath but will find all thoses paths that share the given prefix")
   val version = lFlag("version", "show version")
 
@@ -58,7 +61,7 @@ object knownFlags {
    * so can throw exception if extra flag added to parser but not added to knownArgFlags
    */
   def getShortFlags(name: String): Flag[Any] = {
-    throw new RuntimeException("No Short Flags implemented! so can't find flag called:- "+ name)
+    knownShortFlags(name)
   }
   def getShortArgFlags(name: String): (List[String] => Flag[Any]) = {
     knownShortArgFlags(name)

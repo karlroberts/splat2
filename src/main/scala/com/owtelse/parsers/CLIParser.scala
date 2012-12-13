@@ -21,7 +21,7 @@ class CLIParser extends JavaTokenParsers {
   def shortFlag: Parser[String]         = "-"~>shortFlagName
   def longFlag: Parser[String]          = "--"~>longFlagName
   
-  def shortFlagName: Parser[String]     = "p" | "t" | "d" | "x"
+  def shortFlagName: Parser[String]     = "p" | "t" | "d" | "x" |"v"
   def longFlagName: Parser[String]      = "lax"
   def flagArg: Parser[List[String]]     = rep1sep(someword, ":")
   def someword: Parser[String]          = """\w+\b""".r
