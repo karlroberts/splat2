@@ -16,9 +16,11 @@ trait CliParserTest extends Specification with ScalaCheck with ThrownExpectation
 
   def recogniseShortFlagNames = clips.recogniseShortFlagNames
   def recogniseLongFlagNames = clips.recogniseLongFlagNames
+  def recogniseShortArgFlagNames = clips.recogniseShortArgFlagNames
 
   def parseShortFlags = clips.parseShorFlags
   def parseLongFlags = clips.parseLongFlags
+  def parseShortArgFlags = clips.parseShortArgFlags
 
   def oops = clips.oops
 
@@ -28,7 +30,10 @@ trait CliParserTest extends Specification with ScalaCheck with ThrownExpectation
     import parseTestHelper._
 
     def recogniseShortFlagNames = check { propRecogniseShortFlagNames }
-    def parseShorFlags = skipped // check { propParseShortFlag }
+    def recogniseShortArgFlagNames = check { propRecogniseShortArgFlagNames }
+    def parseShorFlags = check { propParseShortFlag }
+
+    def parseShortArgFlags = check { propParseShortArgFlag }
 
     def recogniseLongFlagNames =  skipped // check { propRecogniseLongFlagNames }
     def parseLongFlags =  skipped // check { propParseLongFlag }
@@ -71,24 +76,23 @@ object parseTestHelper extends CLIParser with FlagGenerator {
     }
   }
 
-  def propKnownFlagnameParses(knownFlags:Map[String,Flag[String]], flagNameGen: Gen[String])(p: Parser[Any]) = forAll(flagNameGen) {
+  def propKnownFlagnameParses(flagNameGen: Gen[String])(p: Parser[Any]) = forAll(flagNameGen) {
     fname: String =>
-      assert(knownFlags.contains(fname), "WTF in flagnmes!!! fname is "+fname)
       val parseResult = parse(p)(fname)
       println("------>>> WTF parsed "+parseResult)
       parseResult match {
         case x: Success[_] => {
           println("--->> parse val =" + x.get)
-          knownFlags.contains(fname)
+          true
         }
         case _ => false
       }
   }
 
-  def propKnownShortFlagnameParses = propKnownFlagnameParses(knownShortFlags,genShortFlagName)(shortFlagName)
-  def propKnownShortArgFlagnameParses = propKnownFlagnameParses(knownShortArgFlags,genShortArgFlagName)(shortFlagName)
+  def propKnownShortFlagnameParses = propKnownFlagnameParses(genShortFlagName)(shortFlagName)
+  def propKnownShortArgFlagnameParses = propKnownFlagnameParses(genShortArgFlagName)(shortFlagName)
 
-  def propKnownLongFlagnameParses = propKnownFlagnameParses(knownLongFlags,genLongFlagName)(longFlagName)
+  def propKnownLongFlagnameParses = propKnownFlagnameParses(genLongFlagName)(longFlagName)
 
 
   //limit the generated arbitrary non flag strings to 2Chars, ie up to and bigger than known strings but not so big as to waste time generating
@@ -125,9 +129,12 @@ object parseTestHelper extends CLIParser with FlagGenerator {
 
   def propParseShortFlag = propParse(genShortFlag)(shortFlag)
 
+  def propParseShortArgFlag = propParse(genShortArgFlag)(shortFlagArg)
+
   def propParseLongFlag = propParse(genLongFlag)(longFlag)
 
-  def propRecogniseShortFlagNames = propKnownShortFlagnameParses // && propNotKnownShortFlagnameParses
+  def propRecogniseShortFlagNames = propKnownShortFlagnameParses && propNotKnownShortFlagnameParses
+  def propRecogniseShortArgFlagNames = propKnownShortArgFlagnameParses // && propNotKnownShortArgFlagnameParses
 
   def propRecogniseLongFlagNames = propKnownLongFlagnameParses && propNotKnownLongFlagnameParses
 
@@ -170,25 +177,28 @@ trait FlagNameGen extends CliParserFixture {
   import Arbitrary.arbitrary
   import com.owtelse.knownFlags._;
 
-  def genShortFlagName = genFlagName(knownShortFlags)
-  def genLongFlagName = genFlagName(knownLongFlags)
+  def genShortFlagName = genFlagName(knownShortFlags.values.toSeq)
+  def genLongFlagName = genFlagName(knownLongFlags.values.toSeq)
   //knownShortArgFlagName is a Map[String, (List[String] => Flag[String])]
   //ie a container of Functions... mmm sounds like an applicative..
   //genFlagName expects a Map[Sting, Flag[String]]
   // if I can use Applicative functor to apply the funcs in container to a List of Strings then I'll have a Container of
   // flags which is what I need, but Map is kind ** I need * ie M[A] not M[A,B] so a little type lambda should fix that up
   //Then I can applic it
-  def genShortArgFlagName = genFlagName(knownShortArgFlags)
+  //do type lambda to make M[A,B] look like M[B] with A fixed.
+  var sArgFlags = knownShortArgFlags.values.toList
+  var theArgFlags = sArgFlags ∘ (f => f(List("dummy arg")))
+  def genShortArgFlagName = genFlagName(theArgFlags)
 
   def genSizedNotShortFlagName(n: Int) = Gen.resize(n, genNotFlagName(knownShortFlags))
   def genSizedNotLongFlagName(n: Int) = Gen.resize(n, genNotFlagName(knownLongFlags))
 
 
 
-  def genFlagName(knownFlags: Map[String, Flag[String]]): Gen[String] = for {
-    s <- Gen.oneOf(knownFlags.values.toSeq)
+  def genFlagName(knownFlagValues: Seq[Flag[String]]): Gen[String] = for {
+    s <- Gen.oneOf(knownFlagValues)
 
-  } yield {println("----->>>> Generated known flag..." + s.symbol); s.symbol}
+  } yield { knownFlagValues.foreach(x => print(" " + x.symbol + " :")); println("----->>>> Generated known flag..." + s.symbol); s.symbol}
 
 
   def genNotFlagName(knownFlags: Map[String, Flag[String]]): Gen[String] = Gen.sized {
@@ -210,6 +220,7 @@ trait FlagGenerator extends FlagNameGen {
 
   def genLongFlag = genFlag(flagPrefix+flagPrefix)(genLongFlagName)
   def genShortFlag = genFlag(flagPrefix)(genShortFlagName)
+  def genShortArgFlag = genFlag(flagPrefix)(genShortArgFlagName)
   
   def genFlag(flagPrefix: String)(flagNameGen: Gen[String]) = for {
     name <- flagNameGen

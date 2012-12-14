@@ -16,12 +16,14 @@ class CLIParser extends JavaTokenParsers {
   def flag: Parser[Any]                 = switch | flagWithArg
   def switch: Parser[Any]               = shortFlag | longFlag
   def flagWithArg: Parser[Any]          = shortFlagArg | longFlagArg
-  def shortFlagArg: Parser[Any]         = shortFlag~flagArg                ^^ { case flag~argList => shortArgFlag(flag)(argList) }
+  def shortFlagArg: Parser[Flag[_]]      = shortArgFlg~flagArg          ^^ { case flag~argList => shortArgFlag(flag)(argList) }
   def longFlagArg: Parser[Any]          = longFlag~flagArg                 ^^ { case flag~argList => longArgFlag(flag)(argList) }
+  def shortArgFlg: Parser[String]      = "-"~>shortArgFlagName
   def shortFlag: Parser[String]         = "-"~>shortFlagName
   def longFlag: Parser[String]          = "--"~>longFlagName
-  
-  def shortFlagName: Parser[String]     = "p" | "t" | "d" | "x" |"v"
+
+  def shortArgFlagName: Parser[String]  = "p" | "t" | "d" | "x"
+  def shortFlagName: Parser[String]     = "v"
   def longFlagName: Parser[String]      = "lax"
   def flagArg: Parser[List[String]]     = rep1sep(someword, ":")
   def someword: Parser[String]          = """\w+\b""".r

@@ -11,7 +11,7 @@ sealed trait Flag[+A] {
 }
 
 case object emptyFlag extends Flag[Nothing] {
-  val symbol = "empty"
+  val symbol = "()"
   val description = "empty"
 }
 

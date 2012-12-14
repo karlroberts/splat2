@@ -44,8 +44,7 @@ object knownFlags {
   val knownShortArgFlags = Map(
     "p" -> props ,
     "t" -> templates ,
-    "d" -> templateDirs ,
-    "x" -> emptyFlagz
+    "d" -> templateDirs
   )
   val knownShortFlags = Map(
     "v" -> verbose
