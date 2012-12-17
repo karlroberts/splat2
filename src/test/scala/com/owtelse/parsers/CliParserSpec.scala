@@ -13,9 +13,9 @@ class CliParserSpec extends CliParserTest {
   def is = sequential ^
     "Can Recognise small flagnames but fail for unrecognised flagnames"                                                 ! recogniseShortFlagNames ^
     "Can Recognise long flagnames but fail for unrecognised flagnames"                                                  ! recogniseLongFlagNames ^
-    "Can Recognise shortArgFlag names but fail for unrecognised flagnames"                                                  ! recogniseShortArgFlagNames ^
     "Can parse shortFlags"                                                                                              ! parseShortFlags ^
     "Can parse longFlags"                                                                                               ! parseLongFlags ^
+    "Can Recognise shortArgFlag names but fail for unrecognised flagnames"                                              ! recogniseShortArgFlagNames ^
     "Can parse shortArgFlags"                                                                                           ! parseShortArgFlags ^
     "oops"                                                                                                              ! oops ^
                                                                                                                         end

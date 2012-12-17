@@ -12,7 +12,6 @@ class CliParserManualSpec extends Specification {
     "shortFlag will parse -p into type (String => SimpleArgFlag[_])"                                                    ! properties ^
     "shortFlag will parse -t into type (String => SimpleArgFlag[_])"                                                    ! templates ^
     "shortFlag will parse -d into type (String => SimpleArgFlag[_])"                                                    ! templateDirs ^
-    "shortFlag will parse -x emptyFlag"                                                                                 ! emptyFlags ^
     "shortFlag will parse -unknown into  Failure type"                                                                  ! unknown ^
     "shortFlagArg will parse -p a1:a2:a3 into a props containing the args"                                              ! propsWithArgs ^
     "longFlag will parse --lax into a lax Flag"                                                                         ! lax ^
@@ -21,7 +20,6 @@ class CliParserManualSpec extends Specification {
   def aWord = clips.aWord
   def checkflagArg = clips.checkflagArg
   def properties = clips.e1
-  def emptyFlags = clips.emptyFlags
   def unknown = clips.unknown
   def templates = clips.templates
   def templateDirs = clips.templateDirs
@@ -31,7 +29,7 @@ class CliParserManualSpec extends Specification {
   object clips {
     import parseTestHelper._
 
-    def testFlag(p: Parser[_])(utterance :String)(expected: String) = {
+    def testFlag(p: Parser[_])(utterance :String)(expected: Flag[Any]) = {
       val pRez = parse(p)(utterance)
       pRez must beLike { case Success(e, _) => e === expected }
     }
@@ -69,16 +67,15 @@ class CliParserManualSpec extends Specification {
     }
 
 
-    def e1 = testFlag(shortFlag)("-p")("p")
+    def e1 = testFlag(shortFlgArg)("-p a:b:c")(SimpleArgFlag("p","properties",List("a", "b", "c")))
 
-    def templates = testFlag(shortFlag)("-t")("t")
+    def templates = testFlag(shortFlgArg)("-t a:b:c")(SimpleArgFlag("t","templates",List("a", "b", "c")))
 
-    def templateDirs = testFlag(shortFlag)("-d")("d")
+    def templateDirs = testFlag(shortFlgArg)("-d a")(SimpleArgFlag("d","templateDirs",List("a")))
 
-    def emptyFlags = testFlag(shortFlag)("-x")("x")
 
     def unknown = {
-      val pRez = parse(shortFlag)("-unknown")
+      val pRez = parse(shortFlg)("-unknown")
 
       pRez match {
         case x:Success[_] => false
@@ -87,7 +84,7 @@ class CliParserManualSpec extends Specification {
     }
     
     def propsWithArgs = {
-      val pRez = parse(shortFlagArg)("-p a1:a2:a3")
+      val pRez = parse(shortFlgArg)("-p a1:a2:a3")
       pRez match {
         case x: Success[_] => {
           val pVal = x.get
@@ -107,7 +104,7 @@ class CliParserManualSpec extends Specification {
       }
     }  
 
-    def lax = testFlag(longFlag)("--lax")("lax")
+    def lax = testFlag(longFlg)("--lax")(LongFlag("lax", "opposite of Strict, ie does not need a full envpath but will find all thoses paths that share the given prefix"))
   }
 }
 

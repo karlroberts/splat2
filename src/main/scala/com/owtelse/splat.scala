@@ -15,6 +15,7 @@ package object splat {
   def lFlag[A] = LongFlag
 
   // lookup a known flag
+  def shortFlag = getShortFlags _
   def shortArgFlag = getShortArgFlags _
   def longArgFlag = getLongArgFlags _
   def longFlag = getLongFlags _
@@ -59,16 +60,16 @@ object knownFlags {
   /**note does not return an Option because parser only allows certain flags anyway,
    * so can throw exception if extra flag added to parser but not added to knownArgFlags
    */
-  def getShortFlags(name: String): Flag[Any] = {
+  def getShortFlags(name: String): Flag[String] = {
     knownShortFlags(name)
   }
-  def getShortArgFlags(name: String): (List[String] => Flag[Any]) = {
+  def getShortArgFlags(name: String): (List[String] => Flag[String]) = {
     knownShortArgFlags(name)
   }
-  def getLongFlags(name: String): Flag[Any] = {
+  def getLongFlags(name: String): Flag[String] = {
     knownLongFlags(name)
   }
-  def getLongArgFlags(name: String): (List[String] => Flag[Any]) = {
+  def getLongArgFlags(name: String): (List[String] => Flag[String]) = {
     throw new RuntimeException("No Long Arg Flags implemented! so can't find flag called:- "+ name)
   }
 }
